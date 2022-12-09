@@ -16,9 +16,14 @@ public class BookService {
 	@Autowired
 	private BookRepo bookRepo;
 	
-	public Book createBook(Book book, int authorId){
-		//Book createbook= bookRepo.findByAuthorId(authorId);
+	public Book createBook(Book book, int authorId) throws Exception{
+		Book createbook= bookRepo.findByTitleAndAuthorId(book.getTitle(),authorId);
+		if(createbook!=null) {
 			return bookRepo.save(book);
+		}
+		else {
+			throw new Exception("Book already exists");
+		}
 
 	}
 	

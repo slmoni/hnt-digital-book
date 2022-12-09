@@ -44,7 +44,7 @@ public class Book {
 	@Column(name="publisheddate")
 	private Date publisheddate;
 	
-	@Column(name="isBlocked", columnDefinition = "boolean default false")
+	@Column(name="isBlocked")
 	private boolean isBlocked;
 	
 //	private BookContent bookContent;

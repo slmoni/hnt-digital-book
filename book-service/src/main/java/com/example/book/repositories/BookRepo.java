@@ -15,6 +15,6 @@ public interface BookRepo extends JpaRepository<Book, Integer> {
 	
 	Book findByIdAndAuthorId(int id, int authorId);
 	
-	Book findByAuthorId(int authorId);
+	Book findByTitleAndAuthorId(String title,int authorId);
 	
 }
