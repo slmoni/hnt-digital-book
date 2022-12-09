@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.book.models.Book;
 import com.example.book.models.BookContent;
+import com.example.book.repositories.BookRepo;
 import com.example.book.services.BookService;
 
 @RestController
@@ -25,36 +26,79 @@ import com.example.book.services.BookService;
 public class BookController {
 	
 	@Autowired
+	private BookRepo bookRepo;
+	
+	@Autowired
 	private BookService bookService;
 	
+	/* Search books */
 	@GetMapping("/search/{category}/{title}/{authorId}/{price}/{publisher}")
 	public List<Book> searchbooks(@PathVariable String category, @PathVariable String title, @PathVariable int authorId, @PathVariable String publisher) {
-		return bookService.searchbook(category, title, authorId, publisher);
+		return bookService.searchBook(category, title, authorId, publisher);
 	}
 	
+	/* Author create book */
 	@PostMapping("/author/{authorId}/createbook")
-	public ResponseEntity<Book> createBook(@RequestBody @Valid Book book, @PathVariable int authorId) throws Exception {
+	public ResponseEntity<?> createBook(@RequestBody @Valid Book book, @PathVariable int authorId) throws Exception {
+		if(authorId == 0) {
+			return ResponseEntity.badRequest().body("Please give valid author Id");
+		}
 		return new ResponseEntity<>( bookService.createBook(book, authorId), HttpStatus.OK);
 	}
 	
+	/* Author update book */
 	@PutMapping("/author/{authorId}/updatebook/{id}")
-	public Book updateBook(@RequestBody @Valid Book book, @PathVariable int authorId, @PathVariable int id) throws Exception {
-		return bookService.updateBook(book, authorId, id);
+	public ResponseEntity<?> updateBook(@RequestBody @Valid Book book, @PathVariable int authorId, @PathVariable int id) throws Exception {
+		return new ResponseEntity<>(bookService.updateBook(book, authorId, id), HttpStatus.OK);
 	}
 	
+	/* Author block/unblock book */
 	@PostMapping("/author/{authorId}/books/{id}/{isBlocked}")
-	public Book blockBook(@PathVariable int authorId, @PathVariable int id, @PathVariable String isBlocked) throws Exception {
-		return bookService.blockBook(authorId, id, isBlocked);
+	public  ResponseEntity<?> blockBook(@PathVariable int authorId, @PathVariable int id, @PathVariable String isBlocked) throws Exception {
+		return new ResponseEntity<>( bookService.blockBook(authorId, id, isBlocked),HttpStatus.OK);
 	}
 	
-	@GetMapping("{id}")
-	public Optional<Book> subscribeBook(@PathVariable int id) {
-		return bookService.subscribeBook(id);
+	/* Reader can read a book */
+	@GetMapping("books/{id}/readbook")
+	public ResponseEntity<?> readBook(@PathVariable int id) {
+		Book book= bookService.readBook(id);
+		if(book!=null) {
+			return ResponseEntity.ok(book);
+		} else {
+			return ResponseEntity.badRequest().body("Book does not exist"); 
+		}
 	}
 	
-	@GetMapping("/subscribe/{id}")
-	public BookContent subscribeContent(@PathVariable int id) {
-		return bookService.subscribeContent(id);
+	/* Reader get subscribed book */ //Needs to be updated
+	@GetMapping("/{id}/getsubscribedbook")
+	public ResponseEntity<?> getSubscribedBook(@PathVariable int id) {
+		Book subscribed = bookService.getSubscribedBook(id);
+		if(subscribed !=null) {
+			return ResponseEntity.ok(subscribed);
+		} else {
+			return ResponseEntity.badRequest().body("Not susbcribed");
+		}
+		 
 	}
+	
+	/* Reader get all subscribed books */
+	@PostMapping("/getallsubscribedbook")
+	public ResponseEntity<?> getAllSubscribedBook(@RequestBody List<Integer> bookId) {
+		if(bookId.isEmpty()) {
+			return ResponseEntity.badRequest().body("Invalid Ids");
+		}
+		List<Book> subscribedBooks= bookService.getAllSubscribedBooks(bookId);
+		if(subscribedBooks.isEmpty()) {
+			return ResponseEntity.badRequest().body("No subscribed books");
+		}else {
+			return ResponseEntity.ok(subscribedBooks);
+		} 
+	}
+//
+//	/* Reader can subscribe content */
+//	@GetMapping("/subscribe/{id}")
+//	public BookContent subscribeContent(@PathVariable int id) {
+//		return bookService.subscribeContent(id);
+//	}
 
 }

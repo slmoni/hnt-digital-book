@@ -13,8 +13,8 @@ public interface BookRepo extends JpaRepository<Book, Integer> {
 	@Query(value="select id, price, content, publisheddate, category, title, isBlocked, authorId, publisher from books b where b.category=:category and b.title=:title and b.authorId=:authorId and b.publisher=:publisher and b.isBlocked=false", nativeQuery = true)
 	List<Book> search(String category,String title, int authorId, String publisher);
 	
-	Book findByIdAndAuthorId(int id, int authorId);
+	Optional<Book> findByIdAndAuthorId(int id, int authorId);
 	
-	Book findByTitleAndAuthorId(String title,int authorId);
+	Optional<Book> findByTitleAndAuthorId(String title,int authorId);
 	
 }

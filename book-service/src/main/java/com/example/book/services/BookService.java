@@ -1,7 +1,9 @@
 package com.example.book.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,23 @@ public class BookService {
 	@Autowired
 	private BookRepo bookRepo;
 	
+	public Book getBook(int id) {
+		Optional<Book> existbook= bookRepo.findById(id);
+		if(existbook.isPresent()) {
+			return existbook.get();
+		}
+		return null;
+	}
+	
+	public List<Book> getAllBooks(){
+		List<Book> books=bookRepo.findAll();
+		return books;
+	}
+	
 	public Book createBook(Book book, int authorId) throws Exception{
-		Book createbook= bookRepo.findByTitleAndAuthorId(book.getTitle(),authorId);
-		if(createbook!=null) {
+		Optional<Book> createbook= bookRepo.findByTitleAndAuthorId(book.getTitle(),authorId);
+		if(createbook.isEmpty()) {
+			book.setAuthorId(authorId);
 			return bookRepo.save(book);
 		}
 		else {
@@ -29,22 +45,30 @@ public class BookService {
 	
 	public Book updateBook(Book book, int authorId, int id) throws Exception {
 		if(bookRepo.existsById(id)) {
-			book.setAuthorId(authorId);
-			return bookRepo.save(book);
+			Book bookexisted= getBook(id);
+			bookexisted.setAuthorId(authorId);
+			bookexisted.setCategory(book.getCategory());
+			bookexisted.setContent(book.getContent());
+			bookexisted.setPrice(book.getPrice());
+			bookexisted.setPublisheddate(book.getPublisheddate());
+			bookexisted.setPublisher(book.getPublisher());
+			bookexisted.setTitle(book.getTitle());
+			return bookRepo.save(bookexisted);
 		}else{
-		throw new Exception("Cannot find the book with authorID:"+authorId);
+		throw new Exception("Cannot find the book with ID:"+id);
 		}
 	}
 	
-	public Book blockBook(int authorId, int id, String block) throws Exception {
-		Book blockbook=bookRepo.findByIdAndAuthorId(id, authorId);
+	public Optional<Book> blockBook(int authorId, int id, String block) throws Exception {
+		Optional<Book> blockbook=bookRepo.findByIdAndAuthorId(id, authorId);
 		if(blockbook!=null) {
 			if(block.equalsIgnoreCase("yes")) {
-				blockbook.setBlocked(true);
-				bookRepo.save(blockbook);
+				blockbook.get().setBlocked(true);
+				bookRepo.save(blockbook.get());
 				return blockbook;
 			} else if(block.equalsIgnoreCase("no")) {
-				blockbook.setBlocked(false);
+				blockbook.get().setBlocked(false);
+				bookRepo.save(blockbook.get());
 				return blockbook;
 			}
 		} else if(blockbook==null){
@@ -53,7 +77,7 @@ public class BookService {
 		return null;
 	}
 	
-	public List<Book> searchbook(String category, String title, int authorId, String publisher){
+	public List<Book> searchBook(String category, String title, int authorId, String publisher){
 	 List<Book> searchedbooks= bookRepo.search(category, title, authorId, publisher);
 	 if(searchedbooks.isEmpty()) {
 		 System.out.println("No Books present");
@@ -62,11 +86,19 @@ public class BookService {
 	 return searchedbooks;
 	}
 	
-	public Optional<Book> subscribeBook(int id) {
-		Optional<Book> subscribebook = bookRepo.findById(id);
+	public Book readBook(int id) {
 		if(bookRepo.existsById(id)) {
-			
-			//subscribebook.get().getBookContent().setSubscribed(true);
+			Book book=getBook(id);
+			if(!book.isBlocked()) {
+				return book;
+			}
+		}
+		return null;
+	}
+	
+	public Book getSubscribedBook(int id) {
+		Book subscribebook = getBook(id);
+		if(subscribebook!=null) {
 			return subscribebook;
 		} else {
 			return null;
@@ -85,5 +117,15 @@ public class BookService {
 			return null;
 		}
 	}
-
+	
+	
+	public List<Book> getAllSubscribedBooks(List<Integer> bookIds) {
+		List<Book> susbscribedBookList = new ArrayList<Book>();
+		List<Book> bookList= bookRepo.findAllById(bookIds);
+		susbscribedBookList=bookList.stream().filter(Book::isBlocked).collect(Collectors.toList());
+		return susbscribedBookList;
+	}
+	
 }
+
+
