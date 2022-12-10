@@ -40,9 +40,15 @@ public class User {
 	@JoinTable(	name = "user_roles", 
 				joinColumns = @JoinColumn(name = "user_id"), 
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
-	
-	//@Column(name="RoleId")
 	private Set<Role> roles = new HashSet<>();
+	
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name="user_subscription",
+				joinColumns = @JoinColumn(name="user_id"),
+				inverseJoinColumns = @JoinColumn(name="susbscription_id"))
+	private Set<ReaderSubscription> subscriptions= new HashSet<>();
+
+
 
 	public User() {
 	}
@@ -51,6 +57,15 @@ public class User {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+	}
+
+	public User (String username, String email, String password, Set<Role> roles, Set<ReaderSubscription> subscriptions) {
+		super();
+		this.username = username;
+		this.email = email;
+		this.password = password;
+		this.roles = roles;
+		this.subscriptions = subscriptions;
 	}
 
 	public Long getId() {
@@ -91,5 +106,13 @@ public class User {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+	
+	public Set<ReaderSubscription> getSubscriptions() {
+		return subscriptions;
+	}
+
+	public void setSubscriptions(Set<ReaderSubscription> subscriptions) {
+		this.subscriptions = subscriptions;
 	}
 }

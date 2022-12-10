@@ -1,12 +1,15 @@
 package com.bezkoder.springjwt.controllers;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,26 +18,34 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bezkoder.springjwt.models.ERole;
 import com.bezkoder.springjwt.models.Role;
 import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.payload.request.BookRequest;
 import com.bezkoder.springjwt.payload.request.LoginRequest;
 import com.bezkoder.springjwt.payload.request.SignupRequest;
+import com.bezkoder.springjwt.payload.request.SubscriptionRequest;
 import com.bezkoder.springjwt.payload.response.JwtResponse;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/digitalbooks")
 public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -47,6 +58,9 @@ public class AuthController {
 
 	@Autowired
 	PasswordEncoder encoder;
+	
+	@Autowired
+	ObjectMapper mapper;
 
 	@Autowired
 	JwtUtils jwtUtils;
@@ -93,11 +107,9 @@ public class AuthController {
 
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
-//		System.out.println("USER ROLES FROM JSON:"+strRoles.toString());
-//		System.out.println("ROLE REPOSITORY:"+ roleRepository.findByName(ERole.ROLE_AUTHOR));
 
 		if (strRoles == null) {
-			Role userRole = roleRepository.findByName("ROLE_READER")
+			Role userRole = roleRepository.findByName("ROLE_GUEST")
 					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 			roles.add(userRole);
 		} else {
@@ -116,7 +128,7 @@ public class AuthController {
 
 					break;
 				default:
-					Role userRole = roleRepository.findByName("ROLE_READER")
+					Role userRole = roleRepository.findByName("ROLE_GUEST")
 					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(userRole);
 					
@@ -129,4 +141,50 @@ public class AuthController {
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
+	
+	
+	@PostMapping("/author/{authorId}/createbook")
+	public ResponseEntity<?> createBook(HttpServletRequest request, @Valid @RequestBody BookRequest book, @PathVariable Long authorId) throws JsonParseException, JsonMappingException, IOException{
+		if(authorId==null) {
+			return ResponseEntity.badRequest().body("Please give valid author Id");
+		}
+		return null;
+		
+	}
+	
+	@PutMapping("author/{author-id}/updatebook/{book-id}")
+	@PreAuthorize("hasRole('AUTHOR')")
+	public ResponseEntity<?> updatebook(@RequestBody BookRequest book, @PathVariable Long bookId, @PathVariable Long authorId) {
+		return null;
+	}
+	
+	@PostMapping("digitalbooks/author/{author-id}/books/{book-id}/{isBlocked}")
+	@PreAuthorize("hasRole('AUTHOR')")
+	public ResponseEntity<?> blockBook(@PathVariable Long authorId, @PathVariable Long bookId, @PathVariable String isBlocked) {
+		return null;
+	}
+	
+	@GetMapping("/search")
+	public ResponseEntity<?>searchBooks(@PathVariable String category, @PathVariable String title, 
+			@PathVariable String author, @PathVariable Long price, @PathVariable String publisher) {
+		return null;
+	}
+	
+	@PostMapping("/{book-id}/subscribe")
+	@PreAuthorize("hasRole('READER')")
+	public ResponseEntity<?>subscribeBook(@RequestBody SubscriptionRequest subscription, @PathVariable Long userId) {
+		return null;
+	} 
+	
+	@PostMapping("/readers/{userId}/books/{subscription-id}/cancel-subscription")
+	@PreAuthorize("hasRole('READER')")
+	public ResponseEntity<?>cancelSubscription(@PathVariable Long userId, @PathVariable Long subId) {
+		return null;
+	}
+	
+	@PostMapping("/readers/{userId}/books")
+	@PreAuthorize("hasRole('READER')")
+	public ResponseEntity<?>fectchAllSubscribedBook(@PathVariable Long userId) {
+		return null;
+	} 
 }
