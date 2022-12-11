@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,15 +71,27 @@ public class BookController {
 	}
 	
 	/* Reader get subscribed book */ //Needs to be updated
-	@GetMapping("/{id}/getsubscribedbook")
-	public ResponseEntity<?> getSubscribedBook(@PathVariable int id) {
-		Book subscribed = bookService.getSubscribedBook(id);
-		if(subscribed !=null) {
-			return ResponseEntity.ok(subscribed);
-		} else {
-			return ResponseEntity.badRequest().body("Not susbcribed");
-		}
-		 
+//	@GetMapping("/{id}/getsubscribedbook")
+//	public ResponseEntity<?> getSubscribedBook(@PathVariable int id) {
+//		Book subscribed = bookService.getSubscribedBook(id);
+//		if(subscribed !=null) {
+//			return ResponseEntity.ok(subscribed);
+//		} else {
+//			return ResponseEntity.badRequest().body("Book not susbcribed");
+//		}
+//		 
+//	}
+	
+	
+	/* Reader can get book by Id */
+	@GetMapping("/getbook/{id}")
+	public ResponseEntity<?> getBook(@PathVariable int id) {
+		 Book book = bookService.getBook(id);
+		 if(!(ObjectUtils.isEmpty(book)) && book.isBlocked()==false) {
+			 return ResponseEntity.ok(book);
+		 } else {
+			 return ResponseEntity.badRequest().body("Book does not exist");
+		 }
 	}
 	
 	/* Reader get all subscribed books */
@@ -89,16 +102,10 @@ public class BookController {
 		}
 		List<Book> subscribedBooks= bookService.getAllSubscribedBooks(bookId);
 		if(subscribedBooks.isEmpty()) {
-			return ResponseEntity.badRequest().body("No subscribed books");
+			return ResponseEntity.badRequest().body("No books with the given Ids");
 		}else {
 			return ResponseEntity.ok(subscribedBooks);
 		} 
 	}
-//
-//	/* Reader can subscribe content */
-//	@GetMapping("/subscribe/{id}")
-//	public BookContent subscribeContent(@PathVariable int id) {
-//		return bookService.subscribeContent(id);
-//	}
 
 }

@@ -96,14 +96,14 @@ public class BookService {
 		return null;
 	}
 	
-	public Book getSubscribedBook(int id) {
-		Book subscribebook = getBook(id);
-		if(subscribebook!=null) {
-			return subscribebook;
-		} else {
-			return null;
-		}
-	}
+//	public Book getSubscribedBook(int id) {
+//		Book subscribebook = getBook(id);
+//		if(subscribebook!=null) {
+//			return subscribebook;
+//		} else {
+//			return null;
+//		}
+//	}
 	
 	
 	public BookContent subscribeContent(int id) {

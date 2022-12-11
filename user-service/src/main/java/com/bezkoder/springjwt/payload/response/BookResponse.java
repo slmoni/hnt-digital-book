@@ -6,11 +6,11 @@ import java.util.Date;
 
 public class BookResponse {
 	
-	private int id;
+	private Long id;
 
 	private String title;
 
-	private int authorId;
+	private Long authorId;
 	
 	private String authorName;
 
@@ -30,28 +30,27 @@ public class BookResponse {
 		
 	}
 
-	public BookResponse(int id, String title, int authorId, String authorName, double price, String category,
-			String content, String publisher, Date publisheddate, boolean isBlocked) {
-		super();
-		this.id = id;
-		this.title = title;
-		this.authorId = authorId;
-		this.authorName = authorName;
-		this.price = price;
-		this.category = category;
-		this.content = content;
-		this.publisher = publisher;
-		this.publisheddate = publisheddate;
-		this.isBlocked = isBlocked;
-	}
-
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
+
+
+
+	public Long getAuthorId() {
+		return authorId;
+	}
+
+
+
+	public void setAuthorId(Long authorId) {
+		this.authorId = authorId;
+	}
+
+
 
 	public String getTitle() {
 		return title;
@@ -59,14 +58,6 @@ public class BookResponse {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public int getAuthorId() {
-		return authorId;
-	}
-
-	public void setAuthorId(int authorId) {
-		this.authorId = authorId;
 	}
 
 	public String getAuthorName() {

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class BookRequest {
@@ -11,8 +12,7 @@ public class BookRequest {
 	@Size(min=1, max=50)
 	private String title;
 	
-	@NotBlank
-	private int authorId;
+	private Long authorId;
 	
 	private String authorName;
 
@@ -36,11 +36,11 @@ public class BookRequest {
 		this.title = title;
 	}
 
-	public int getAuthorId() {
+	public Long getAuthorId() {
 		return authorId;
 	}
 
-	public void setAuthorId(int authorId) {
+	public void setAuthorId(Long authorId) {
 		this.authorId = authorId;
 	}
 

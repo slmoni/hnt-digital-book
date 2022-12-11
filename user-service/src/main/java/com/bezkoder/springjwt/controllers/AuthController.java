@@ -38,6 +38,7 @@ import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
+import com.bezkoder.springjwt.security.services.UserBookService;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -49,6 +50,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
+	
+	@Autowired
+	UserBookService userService;
 
 	@Autowired
 	UserRepository userRepository;
@@ -143,48 +147,51 @@ public class AuthController {
 	}
 	
 	
-	@PostMapping("/author/{authorId}/createbook")
-	public ResponseEntity<?> createBook(HttpServletRequest request, @Valid @RequestBody BookRequest book, @PathVariable Long authorId) throws JsonParseException, JsonMappingException, IOException{
-		if(authorId==null) {
-			return ResponseEntity.badRequest().body("Please give valid author Id");
-		}
-		return null;
-		
-	}
-	
-	@PutMapping("author/{author-id}/updatebook/{book-id}")
-	@PreAuthorize("hasRole('AUTHOR')")
-	public ResponseEntity<?> updatebook(@RequestBody BookRequest book, @PathVariable Long bookId, @PathVariable Long authorId) {
-		return null;
-	}
-	
-	@PostMapping("digitalbooks/author/{author-id}/books/{book-id}/{isBlocked}")
-	@PreAuthorize("hasRole('AUTHOR')")
-	public ResponseEntity<?> blockBook(@PathVariable Long authorId, @PathVariable Long bookId, @PathVariable String isBlocked) {
-		return null;
-	}
-	
 	@GetMapping("/search")
 	public ResponseEntity<?>searchBooks(@PathVariable String category, @PathVariable String title, 
 			@PathVariable String author, @PathVariable Long price, @PathVariable String publisher) {
-		return null;
+		return userService.searchBooks(category, title, author, price, publisher);
 	}
 	
-	@PostMapping("/{book-id}/subscribe")
+	@PostMapping("/author/{authorId}/createbook")
+	public ResponseEntity<?> createBook(HttpServletRequest request, @Valid @RequestBody BookRequest book, @PathVariable Long authorId) throws JsonParseException, JsonMappingException, IOException{
+		return userService.createBook(request, book, authorId);
+		
+	}
+	
+	@PutMapping("/author/{authorId}/updatebook/{bookId}")
+	@PreAuthorize("hasRole('AUTHOR')")
+	public ResponseEntity<?> updatebook(@RequestBody BookRequest book, @PathVariable Long authorId, @PathVariable Long bookId) {
+		return userService.updatebook(book, authorId, bookId);
+	}
+	
+	@PostMapping("/author/{authorId}/books/{bookId}/{isBlocked}")
+	@PreAuthorize("hasRole('AUTHOR')")
+	public ResponseEntity<?> blockBook(@PathVariable Long authorId, @PathVariable Long bookId, @PathVariable String isBlocked) {
+		return userService.blockBook(authorId, bookId, isBlocked);
+	}
+	
+	@PostMapping("/{bookId}/subscribe")
 	@PreAuthorize("hasRole('READER')")
-	public ResponseEntity<?>subscribeBook(@RequestBody SubscriptionRequest subscription, @PathVariable Long userId) {
-		return null;
+	public ResponseEntity<?>subscribeBook(@RequestBody SubscriptionRequest subscription, @PathVariable Long bookId) {
+		return userService.subscribeBook(subscription, bookId);
 	} 
 	
-	@PostMapping("/readers/{userId}/books/{subscription-id}/cancel-subscription")
+	@PostMapping("/readers/{userId}/books/{subId}/cancel-subscription")
 	@PreAuthorize("hasRole('READER')")
 	public ResponseEntity<?>cancelSubscription(@PathVariable Long userId, @PathVariable Long subId) {
+		return userService.cancelSubscription(userId, subId);
+	}
+	
+	@PostMapping("/readers/{userId}/books/{subId}")
+	@PreAuthorize("hasRole('READER')")
+	public ResponseEntity<?> fetchSubscribedBook(@PathVariable Long userId, @PathVariable Long subId) {
 		return null;
 	}
 	
 	@PostMapping("/readers/{userId}/books")
 	@PreAuthorize("hasRole('READER')")
 	public ResponseEntity<?>fectchAllSubscribedBook(@PathVariable Long userId) {
-		return null;
+		return userService.fectchAllSubscribedBook(userId);
 	} 
 }
