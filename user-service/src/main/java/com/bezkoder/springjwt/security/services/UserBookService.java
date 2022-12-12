@@ -70,6 +70,15 @@ public class UserBookService {
 		return subsList;
 	}
 	
+	public ResponseEntity<?> getAllBooks() {
+		//List<BookResponse> books= new ArrayList<>();
+		String url=bookServiceUrl+"/getAllBooks";
+		RestTemplate restTemplate= new RestTemplate();
+		ResponseEntity<?> result = restTemplate.getForEntity(url, List.class);
+			return ResponseEntity.ok(result.getBody());
+		
+	}
+	
 	
 	public ResponseEntity<?> createBook(HttpServletRequest request, @Valid @RequestBody BookRequest book, @PathVariable Long authorId) throws JsonParseException, JsonMappingException, IOException{
 		if(ObjectUtils.isEmpty(authorId)) {
@@ -126,14 +135,14 @@ public class UserBookService {
 	
 	public ResponseEntity<?>searchBooks(@PathVariable String category, @PathVariable String title, 
 			@PathVariable String author, @PathVariable Long price, @PathVariable String publisher) {
-		if(ObjectUtils.isEmpty(category))
-			return ResponseEntity.badRequest().body(new MessageResponse("Enter category"));
-		if(ObjectUtils.isEmpty(title))
-			return ResponseEntity.badRequest().body(new MessageResponse("Enter title"));
-		if(ObjectUtils.isEmpty(author))
-			return ResponseEntity.badRequest().body(new MessageResponse("Enter author name"));
-		if(ObjectUtils.isEmpty(publisher))
-			return ResponseEntity.badRequest().body(new MessageResponse("Enter publisher"));
+//		if(ObjectUtils.isEmpty(category))
+//			return ResponseEntity.badRequest().body(new MessageResponse("Enter category"));
+//		if(ObjectUtils.isEmpty(title))
+//			return ResponseEntity.badRequest().body(new MessageResponse("Enter title"));
+//		if(ObjectUtils.isEmpty(author))
+//			return ResponseEntity.badRequest().body(new MessageResponse("Enter author name"));
+//		if(ObjectUtils.isEmpty(publisher))
+//			return ResponseEntity.badRequest().body(new MessageResponse("Enter publisher"));
 		if(price < 0)
 			return ResponseEntity.badRequest().body(new MessageResponse("Enter valid price"));
 		Long authorId;
@@ -145,7 +154,7 @@ public class UserBookService {
 			return ResponseEntity.badRequest().body(new MessageResponse("Enter valid author name"));
 		}
 		// /search/{category}/{title}/{authorId}/{price}/{publisher}
-		String url = bookServiceUrl +"/search/"+category+ title+authorId+price+publisher;
+		String url = bookServiceUrl +"/search/"+category+"/"+ title+"/"+authorId+"/"+price+"/"+publisher;
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<BookResponse[]> response = restTemplate.getForEntity(url, BookResponse[].class);
 		BookResponse[] books= response.getBody();

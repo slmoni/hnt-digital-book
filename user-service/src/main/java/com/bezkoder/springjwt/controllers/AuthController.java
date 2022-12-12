@@ -146,8 +146,12 @@ public class AuthController {
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
 	
+	@GetMapping("/getAllBooks")
+	public ResponseEntity<?> getAllBooks(){
+		return userService.getAllBooks();
+	}
 	
-	@GetMapping("/search")
+	@GetMapping("/search/{category}/{title}/{author}/{price}/{publisher}")
 	public ResponseEntity<?>searchBooks(@PathVariable String category, @PathVariable String title, 
 			@PathVariable String author, @PathVariable Long price, @PathVariable String publisher) {
 		return userService.searchBooks(category, title, author, price, publisher);

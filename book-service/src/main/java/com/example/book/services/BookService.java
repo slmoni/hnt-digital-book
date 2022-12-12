@@ -26,7 +26,7 @@ public class BookService {
 		return null;
 	}
 	
-	public List<Book> getAllBooks(){
+	public List<Book> getAllBooks(int authorId){
 		List<Book> books=bookRepo.findAll();
 		return books;
 	}

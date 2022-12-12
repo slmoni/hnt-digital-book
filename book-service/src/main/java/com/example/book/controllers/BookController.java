@@ -107,5 +107,11 @@ public class BookController {
 			return ResponseEntity.ok(subscribedBooks);
 		} 
 	}
+	
+	@GetMapping("/getAllBooks")
+	public ResponseEntity<?> getAllBooks() {
+		List<Book> allBooks= bookService.getAllBooks();
+		return ResponseEntity.ok(allBooks);
+	}
 
 }
