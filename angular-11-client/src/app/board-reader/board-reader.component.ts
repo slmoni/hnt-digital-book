@@ -3,8 +3,8 @@ import { UserService } from '../_services/user.service';
 
 @Component({
   selector: 'app-board-moderator',
-  templateUrl: './board-moderator.component.html',
-  styleUrls: ['./board-moderator.component.css']
+  templateUrl: './board-reader.component.html',
+  styleUrls: ['./board-reader.component.css']
 })
 export class BoardModeratorComponent implements OnInit {
   content?: string;
@@ -12,7 +12,7 @@ export class BoardModeratorComponent implements OnInit {
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.userService.getModeratorBoard().subscribe(
+    this.userService.getReaderBoard().subscribe(
       data => {
         this.content = data;
       },

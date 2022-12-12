@@ -1,15 +1,21 @@
 <div id="app">
   <nav class="navbar navbar-expand navbar-dark bg-dark">
-    <a href="#" class="navbar-brand">bezKoder</a>
+    <a href="#" class="navbar-brand">Digital Books</a>
     <ul class="navbar-nav mr-auto" routerLinkActive="active">
       <li class="nav-item">
         <a href="/home" class="nav-link" routerLink="home">Home </a>
       </li>
-      <li class="nav-item" *ngIf="showAdminBoard">
-        <a href="/admin" class="nav-link" routerLink="admin">Admin Board</a>
+      <li class="nav-item" *ngIf="showAuthorBoard">
+        <a href="/author" class="nav-link" routerLink="author">Author Board</a>
       </li>
-      <li class="nav-item" *ngIf="showModeratorBoard">
-        <a href="/mod" class="nav-link" routerLink="mod">Moderator Board</a>
+      <li class="nav-item" *ngIf="showAuthorBoard">
+        <a href="/booklist" class="nav-link" routerLink="booklist">Book List</a>
+      </li>
+      <li class="nav-item" *ngIf="showReaderBoard">
+        <a href="/reader" class="nav-link" routerLink="reader">Reader Board</a>
+      </li>
+      <li class="nav-item" *ngIf="showReaderBoard">
+        <a href="/subscribedbooks" class="nav-link" routerLink="subscribedbooks">Subscribed Books</a>
       </li>
       <li class="nav-item">
         <a href="/user" class="nav-link" *ngIf="isLoggedIn" routerLink="user">User</a>

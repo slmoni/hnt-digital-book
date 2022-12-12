@@ -1,0 +1,29 @@
+.searchform{
+    margin: auto;
+    width: 550px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-style: solid;
+    text-align: center;
+}
+.row{
+     padding-top: 5px; 
+     padding-left: 15px;
+     width: 550px;
+     margin: auto;
+}
+.id{
+    display: inline-block;
+    width: 200px; 
+    height: 40px;
+}
+.fields{
+   display: inline-block;
+   width: 200px; 
+   height: 40px;
+}
+.btn-primary{
+    background-color: #343a40!important;
+    border-color: #343a40!important;
+    width: 100px;
+}

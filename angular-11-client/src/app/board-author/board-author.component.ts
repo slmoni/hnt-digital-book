@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../_services/user.service';
 
 @Component({
-  selector: 'app-board-admin',
-  templateUrl: './board-admin.component.html',
-  styleUrls: ['./board-admin.component.css']
+  selector: 'app-board-author',
+  templateUrl: './board-author.component.html',
+  styleUrls: ['./board-author.component.css']
 })
 export class BoardAdminComponent implements OnInit {
   content?: string;
@@ -12,7 +12,7 @@ export class BoardAdminComponent implements OnInit {
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.userService.getAdminBoard().subscribe(
+    this.userService.getAuthorBoard().subscribe(
       data => {
         this.content = data;
       },

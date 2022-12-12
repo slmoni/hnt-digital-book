@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../_services/auth.service';
 
 @Component({
@@ -22,9 +23,11 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const { username, email, password } = this.form;
+    const { username, email, password, roles } = this.form;
+    let role=[]
+    role.push(roles);
+    this.authService.register(username, email, password, role).subscribe(
 
-    this.authService.register(username, email, password).subscribe(
       data => {
         console.log(data);
         this.isSuccessful = true;

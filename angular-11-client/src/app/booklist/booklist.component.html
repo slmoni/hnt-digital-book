@@ -1,0 +1,21 @@
+<h2>List of Books</h2>
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Category</th>
+                <!-- <th>Blocked?</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let book of books">
+                <td>{{book.id}}</td>
+                <td>{{book.title}}</td>
+                <td>{{book.category}}</td>
+                <!-- <td>{{book.isBlocked}}</td> -->
+            </tr>
+        </tbody>
+    </table>
+</div>
