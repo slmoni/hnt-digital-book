@@ -6,7 +6,9 @@
                 <th>Id</th>
                 <th>Title</th>
                 <th>Category</th>
-                <!-- <th>Blocked?</th> -->
+                <th>Price</th>
+                <th>IsBlocked</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -14,7 +16,13 @@
                 <td>{{book.id}}</td>
                 <td>{{book.title}}</td>
                 <td>{{book.category}}</td>
-                <!-- <td>{{book.isBlocked}}</td> -->
+                <td>{{book.price}}</td>
+                <td>{{book.blocked}}</td>
+                <td>
+                    <button (click)="updatebook(book.id)" class="btn btn-info">Update</button>
+                    <button  [disabled]="book.blocked" (click)="blockBook(book.id)" class="btn btn-info">Block</button>
+                    <button [disabled]="!book.blocked" (click)="unblockBook(book.id)" class="btn btn-info">Unblock</button>
+                </td>
             </tr>
         </tbody>
     </table>

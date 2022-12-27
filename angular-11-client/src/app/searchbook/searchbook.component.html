@@ -30,6 +30,31 @@
     </div>
 </div>
 
-<div class="searchform" *ngIf="isSuccessful">
-    {{content}}
+<div class="searchformresult" *ngIf="isSuccessful">
+    <h2>List of Books</h2>
+    <div class="container">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let book of books">
+                    <td>{{book.id}}</td>
+                    <td>{{book.title}}</td>
+                    <td>{{book.category}}</td>
+                    <td>{{book.price}}</td>
+                    <td>
+                        <button (click)="subscribe(book.id)" class="btn btn-info">Subscribe</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table> 
+    </div>
+    <!-- {{books}} -->
 </div>

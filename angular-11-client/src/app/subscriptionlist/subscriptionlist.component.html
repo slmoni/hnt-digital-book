@@ -1,0 +1,74 @@
+<h2>List of Books</h2>
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+             
+            <tr *ngFor="let book of books">
+                <td>{{book.id}}</td>
+                <td>{{book.title}}</td>
+                <td>{{book.category}}</td>
+                <td>{{book.price}}</td>
+                <!-- <td *ngFor="let subscription of subscriptions">{{subscription.isSubscribed}}</td> -->
+                <td>
+                    <button (click)="unsubscribe(book.id)"  class="btn btn-info">Unsubscribe</button>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<!-- <p>subscriptionlist works!</p>
+<h2>List of Subscribed Books</h2>
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Subscription ID</th>
+                <th>Book ID</th>
+                <th>IsSubscribed</th>
+                <th>Date</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let subscription of subscriptions">
+                <td>{{subscription.subId}}</td>
+                <td>{{subscription.bookId}}</td>
+                <td>{{subscription.userId}}</td>
+                <td>{{subscription.isSubscribed}}</td>
+                <td>{{subscription.dateOfSubscription}}</td>
+                <td>{{subscription.timeOfSubscription}}</td>
+                <td>
+                    <button (click)="unsubscribe(subscription.subId)" class="btn btn-info">Unsubscribe</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div> -->
+
+<!-- subId: number;
+	
+bookId:number;
+
+userId:number;
+
+isSubscribed:boolean;
+
+dateOfSubscription:Date;
+
+timeOfSubscription:Time; -->

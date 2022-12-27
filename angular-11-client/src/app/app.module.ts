@@ -16,6 +16,9 @@ import { BoardUserComponent } from './board-user/board-user.component';
 import { authInterceptorProviders } from './_helpers/auth.interceptor';
 import { SearchbookComponent } from './searchbook/searchbook.component';
 import { BooklistComponent } from './booklist/booklist.component';
+import { CreatebookComponent } from './createbook/createbook.component';
+import { UpdatebookComponent } from './updatebook/updatebook.component';
+import { SubscriptionlistComponent } from './subscriptionlist/subscriptionlist.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +31,10 @@ import { BooklistComponent } from './booklist/booklist.component';
     BoardModeratorComponent,
     BoardUserComponent,
     SearchbookComponent,
-    BooklistComponent
+    BooklistComponent,
+    CreatebookComponent,
+    UpdatebookComponent,
+    SubscriptionlistComponent
   ],
   imports: [
     BrowserModule,

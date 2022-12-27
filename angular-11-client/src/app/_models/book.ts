@@ -17,6 +17,6 @@ export class Book {
 
 	publisheddate: string;
 
-	isBlocked: boolean;
+	blocked: boolean;
 }
  

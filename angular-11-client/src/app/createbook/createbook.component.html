@@ -1,0 +1,63 @@
+<div class="col-md-8 offset-md-3">
+<h3>Add a book</h3>
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+    <div class="form-group">
+        <label>Title</label>
+        <input type="text" class="form-control" id="title" [(ngModel)]="book.title" name="title">
+    </div>
+    <div class="form-group">
+        <label>Category</label>
+        <input type="text" class="form-control" id="category" [(ngModel)]="book.category" name="category">
+    </div>
+    <div class="form-group">
+        <label>Price</label>
+        <input type="text" class="form-control" id="price" [(ngModel)]="book.price" name="price">
+    </div>
+    <div class="form-group">
+        <label>Publisher</label>
+        <input type="text" class="form-control" id="publisher" [(ngModel)]="book.publisher" name="publisher">
+    </div>
+    <div class="form-group">
+        <label>IsBlocked</label>
+        <input type="text" class="form-control" id="isBlocked" [(ngModel)]="book.blocked" name="isBlocked">
+    </div>
+    <div class="form-group">
+        <label>Content</label>
+        <input type="text" class="form-control" id="content" [(ngModel)]="book.content" name="content">
+    </div>
+
+    <button class="btn btn-success" type="submit">Submit</button>
+
+    <div class="alert alert-warning" *ngIf="f.submitted && !isSuccessful">
+        Unable to create book 
+        <br/> {{errorMessage}}
+    </div>
+
+    <div class="alert alert-sucess" *ngIf="isSuccessful">
+        Book is added
+        <br/> {{book.id}}
+        <br/> {{book.title}}
+    </div>
+</form>
+</div>
+
+
+<!-- id: number;
+
+title: string;
+
+authorId: number;
+
+price: number;
+
+authorName: string;
+
+category: string;
+
+content: string;
+
+publisher: string;
+
+publisheddate: string;
+
+isBlocked: boolean; -->
