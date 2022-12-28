@@ -146,18 +146,29 @@ public class AuthController {
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
 	
+	@GetMapping("/getbook/{bookId}")
+	public ResponseEntity<?> getBook(@PathVariable int bookId) {
+		return userService.getBook(bookId);
+	}
+	
+	@GetMapping("/getAllBooksById/{authorId}")
+	public ResponseEntity<?> getAllBooksById(@PathVariable int authorId){
+		return userService.getAllBooksById(authorId);
+	}
+	
 	@GetMapping("/getAllBooks")
 	public ResponseEntity<?> getAllBooks(){
 		return userService.getAllBooks();
 	}
 	
 	@GetMapping("/search/{category}/{title}/{author}/{price}/{publisher}")
-	public ResponseEntity<?>searchBooks(@PathVariable String category, @PathVariable String title, 
-			@PathVariable String author, @PathVariable Long price, @PathVariable String publisher) {
+	public ResponseEntity<?>searchBooks(@PathVariable(required=false) String category, @PathVariable(required=false) String title, 
+			@PathVariable(required=false) String author, @PathVariable(required=false) Long price, @PathVariable(required=false) String publisher) {
 		return userService.searchBooks(category, title, author, price, publisher);
 	}
 	
 	@PostMapping("/author/{authorId}/createbook")
+	@PreAuthorize("hasRole('AUTHOR')")
 	public ResponseEntity<?> createBook(HttpServletRequest request, @Valid @RequestBody BookRequest book, @PathVariable Long authorId) throws JsonParseException, JsonMappingException, IOException{
 		return userService.createBook(request, book, authorId);
 		
@@ -175,7 +186,7 @@ public class AuthController {
 		return userService.blockBook(authorId, bookId, isBlocked);
 	}
 	
-	@PostMapping("/{bookId}/subscribe")
+	@PostMapping("/readers/{bookId}/subscribe")
 	@PreAuthorize("hasRole('READER')")
 	public ResponseEntity<?>subscribeBook(@RequestBody SubscriptionRequest subscription, @PathVariable Long bookId) {
 		return userService.subscribeBook(subscription, bookId);
@@ -187,15 +198,27 @@ public class AuthController {
 		return userService.cancelSubscription(userId, subId);
 	}
 	
-	@PostMapping("/readers/{userId}/books/{subId}")
+	@GetMapping("/readers/{userId}/books/{subId}")
 	@PreAuthorize("hasRole('READER')")
 	public ResponseEntity<?> fetchSubscribedBook(@PathVariable Long userId, @PathVariable Long subId) {
-		return null;
+		return userService.fetchSubscribedBook(userId, subId);
 	}
 	
-	@PostMapping("/readers/{userId}/books")
+	@GetMapping("/readers/{userId}/books")
 	@PreAuthorize("hasRole('READER')")
 	public ResponseEntity<?>fectchAllSubscribedBook(@PathVariable Long userId) {
 		return userService.fectchAllSubscribedBook(userId);
-	} 
+	}
+	
+	@GetMapping("/readers/subscriptions/{userId}")
+	@PreAuthorize("hasRole('READER')")
+	public ResponseEntity<?> getSubscriptions(@PathVariable Long userId) {
+		return userService.getSubscriptions(userId);
+	}
+	
+	@GetMapping("/readers/{userId}/subscription/book/{bookId}")
+	@PreAuthorize("hasRole('READER')")
+	public ResponseEntity<?> getSubscriptionOfBook(@PathVariable Long userId, @PathVariable Long bookId) {
+		return userService.getSubscriptionOfBook(userId, bookId);
+	}
 }

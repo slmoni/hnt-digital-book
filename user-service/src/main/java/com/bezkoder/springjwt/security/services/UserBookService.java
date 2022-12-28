@@ -61,17 +61,49 @@ public class UserBookService {
 		return null;
 	}
 	
-	
 	public Set<ReaderSubscription> getAllSubscriptions(Long userId) {		
 		Set<ReaderSubscription> subsList= new HashSet<>();
+
 		Optional<User> user = userRepo.findById(userId);
-		if(user.isPresent() && user.get()!=null)
-			subsList = user.get().getSubscriptions();
-		return subsList;
+		if(user.isPresent() && user.get()!=null) {
+			Set<ReaderSubscription> subs= user.get().getSubscriptions();
+			//Set<ReaderSubscription> subsFromRepo = susbscriptionRepo.findAllById(null);
+			// bookList.stream().filter(book-> (book.isBlocked()==false)).collect(Collectors.toList());
+			subsList= subs.stream().filter(sub->sub.isSubscribed()).collect(Collectors.toSet());
+			return subsList;
+		}
+
+		return null;
 	}
 	
-	public ResponseEntity<?> getAllBooks() {
-		//List<BookResponse> books= new ArrayList<>();
+	public ResponseEntity<?> getBook(int bookId) {
+		if(ObjectUtils.isEmpty(bookId)) {
+			return ResponseEntity.badRequest().body("Please give valid book Id");
+		}
+		// "/getbook/{bookId}"
+		String url=bookServiceUrl+"/getbook/"+bookId;
+		RestTemplate restTemplate= new RestTemplate();
+		BookResponse book = restTemplate.getForObject(url, BookResponse.class);
+		if(book== null || ObjectUtils.isEmpty(book)) {
+			return ResponseEntity.badRequest().body("No Such books exist");
+		}
+			return ResponseEntity.ok(book);
+		
+	}
+	
+	
+	public ResponseEntity<?> getAllBooksById(int authorId) {
+		if(ObjectUtils.isEmpty(authorId)) {
+			return ResponseEntity.badRequest().body("Please give valid author Id");
+		}
+		String url=bookServiceUrl+"/getAllBooksById/"+authorId;
+		RestTemplate restTemplate= new RestTemplate();
+		ResponseEntity<?> result = restTemplate.getForEntity(url, List.class);
+			return ResponseEntity.ok(result.getBody());
+		
+	}
+	
+	public ResponseEntity<?> getAllBooks(){
 		String url=bookServiceUrl+"/getAllBooks";
 		RestTemplate restTemplate= new RestTemplate();
 		ResponseEntity<?> result = restTemplate.getForEntity(url, List.class);
@@ -111,7 +143,7 @@ public class UserBookService {
 		RestTemplate restTemplate = new RestTemplate();
 		try {
 			restTemplate.put(url, book);
-			return ResponseEntity.ok("Updated");
+			return ResponseEntity.ok(book);
 		} catch(Exception e) {
 			System.out.println(e.toString());
 		}
@@ -133,8 +165,8 @@ public class UserBookService {
 	}
 	
 	
-	public ResponseEntity<?>searchBooks(@PathVariable String category, @PathVariable String title, 
-			@PathVariable String author, @PathVariable Long price, @PathVariable String publisher) {
+	public ResponseEntity<?>searchBooks(@PathVariable(required=false) String category, @PathVariable(required=false) String title, 
+			@PathVariable(required=false) String author, @PathVariable(required=false) Long price, @PathVariable(required=false) String publisher) {
 //		if(ObjectUtils.isEmpty(category))
 //			return ResponseEntity.badRequest().body(new MessageResponse("Enter category"));
 //		if(ObjectUtils.isEmpty(title))
@@ -143,51 +175,58 @@ public class UserBookService {
 //			return ResponseEntity.badRequest().body(new MessageResponse("Enter author name"));
 //		if(ObjectUtils.isEmpty(publisher))
 //			return ResponseEntity.badRequest().body(new MessageResponse("Enter publisher"));
-		if(price < 0)
-			return ResponseEntity.badRequest().body(new MessageResponse("Enter valid price"));
-		Long authorId;
-		Optional<User> user = userRepo.findByUsername(author);
-		if(!(ObjectUtils.isEmpty(user))) {
-			authorId=user.get().getId();
-		} else {
-			authorId=null;
-			return ResponseEntity.badRequest().body(new MessageResponse("Enter valid author name"));
+//		if(price < 0)
+//			return ResponseEntity.badRequest().body(new MessageResponse("Enter valid price"));
+		Long authorId=null;
+		if(!(ObjectUtils.isEmpty(author))) {
+			Optional<User> user = userRepo.findByUsername(author);
+			if(!(ObjectUtils.isEmpty(user))) {
+				authorId=user.get().getId();
+			} else {
+				authorId=null;
+				return ResponseEntity.badRequest().body(new MessageResponse("Enter valid author name"));
+			}
 		}
 		// /search/{category}/{title}/{authorId}/{price}/{publisher}
 		String url = bookServiceUrl +"/search/"+category+"/"+ title+"/"+authorId+"/"+price+"/"+publisher;
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<BookResponse[]> response = restTemplate.getForEntity(url, BookResponse[].class);
-		BookResponse[] books= response.getBody();
-		if(books==null)
+		ResponseEntity<?> result = restTemplate.getForEntity(url, List.class);
+		if(result==null)
 			return ResponseEntity.badRequest().body(new MessageResponse("No such books exist"));
-		return ResponseEntity.ok(books);
+		return ResponseEntity.ok(result.getBody());
 	}
 	
 	
 	public ResponseEntity<?> subscribeBook(@RequestBody SubscriptionRequest subscription, @PathVariable Long bookId) {
 		if(ObjectUtils.isEmpty(bookId))
 			return ResponseEntity.badRequest().body(new MessageResponse("Enter book Id"));
-		// /subscribe/{id}
-		String url = bookServiceUrl +"/subscribe/"+bookId;
+		// /getbook/{id}
+		String url = bookServiceUrl +"/getbook/"+bookId;
 		RestTemplate restTemplate = new RestTemplate();
-		BookResponse response = restTemplate.getForObject(url, BookResponse.class);
-		if((ObjectUtils.isEmpty(response)) || response.isBlocked()==true) {
+		BookResponse book = restTemplate.getForObject(url, BookResponse.class);
+		if((ObjectUtils.isEmpty(book)) || book.isBlocked()==true) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Enter valid book Id"));
 		}
 		
 		Optional<User> user = userRepo.findById(subscription.getUserId());
 		if(!(ObjectUtils.isEmpty(user))) {
-			ReaderSubscription subscribebook = new ReaderSubscription();
-			subscribebook.setBookId(bookId);
-			subscribebook.setUserId(user.get().getId());
-			subscribebook.setDateOfSubscription(new Date());
- 		   	subscribebook.setTimeOfSubscription(new Timestamp(System.currentTimeMillis()));
- 		   	subscribebook.setSubscribed(true);
- 		   ReaderSubscription subscribed = susbscriptionRepo.save(subscribebook);
- 		   Set<ReaderSubscription> subscriptions= user.get().getSubscriptions();
- 		   subscriptions.add(subscribed);
- 		   user.get().setSubscriptions(subscriptions);
- 		  return ResponseEntity.ok(userRepo.save(user.get()));
+			Optional<ReaderSubscription> isSubscribedAlready = susbscriptionRepo.findByBookIdAndUserId(bookId, user.get().getId());
+			System.out.println("SUBSCRIPTIONS:"+isSubscribedAlready);
+			if(ObjectUtils.isEmpty(isSubscribedAlready)) {
+				ReaderSubscription subscribebook = new ReaderSubscription();
+				subscribebook.setBookId(bookId);
+				subscribebook.setUserId(user.get().getId());
+				subscribebook.setDateOfSubscription(new Date());
+	 		   	subscribebook.setTimeOfSubscription(new Timestamp(System.currentTimeMillis()));
+	 		   	subscribebook.setSubscribed(true);
+	 		   ReaderSubscription subscribed = susbscriptionRepo.save(subscribebook);
+	 		   Set<ReaderSubscription> subscriptions= user.get().getSubscriptions();
+	 		   subscriptions.add(subscribed);
+	 		   user.get().setSubscriptions(subscriptions);
+	 		   userRepo.save(user.get());
+	 		  return ResponseEntity.ok("Book Subscribed");
+			}
+			 return ResponseEntity.badRequest().body(new MessageResponse("Book is already subscribed"));
 		}
 		return ResponseEntity.badRequest().body(new MessageResponse("User does not exist"));	
 	}
@@ -240,16 +279,51 @@ public class UserBookService {
 			return ResponseEntity.badRequest().body(new MessageResponse("Enter valid user Id"));
 		
 		Set<ReaderSubscription> subscriptionsList = getAllSubscriptions(userId);
-		if(!subscriptionsList.isEmpty()) {
+		if(!subscriptionsList.isEmpty() && !(subscriptionsList == null)) {
 		List<Long> bookIdList = subscriptionsList.stream().map(subscription -> subscription.getBookId()).collect(Collectors.toList());
 			// /getallsubscribedbook
-			String url =bookServiceUrl+"getallsubscribedbook";
+			String url =bookServiceUrl+"/getallsubscribedbook";
 			RestTemplate restTemplate = new RestTemplate();
 			ResponseEntity<?> result = restTemplate.postForEntity(url, bookIdList, List.class);
 			return ResponseEntity.ok(result.getBody());
 		}
-		return ResponseEntity.badRequest().body(new MessageResponse("invalid request"));
+		return ResponseEntity.badRequest().body(new MessageResponse("No subscribed books"));
 	}
 	
+	public ResponseEntity<?> getSubscriptions(Long userId) {
+		if(ObjectUtils.isEmpty(userId)) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Enter user Id"));
+		}
+		Set<ReaderSubscription>subscriptions= getAllSubscriptions(userId);
+		if(!subscriptions.isEmpty() && subscriptions!=null)
+			return ResponseEntity.ok(subscriptions);
+		
+		return ResponseEntity.badRequest().body(new MessageResponse("No subscriptions for this user"));
+	}
+	
+	public ResponseEntity<?> getASubscription(Long userId, Long subsId) {
+		if(ObjectUtils.isEmpty(userId)) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Enter user Id"));
+		}
+		ReaderSubscription subscription= getSubscription(userId,subsId);
+		if(!(ObjectUtils.isEmpty(subscription)) && subscription!=null)
+			return ResponseEntity.ok(subscription);
+		
+		return ResponseEntity.badRequest().body(new MessageResponse("No such subscription exist for this user"));
+	}
+	
+	public ResponseEntity<?> getSubscriptionOfBook(Long userId, Long bookId) {
+		if(ObjectUtils.isEmpty(userId)) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Please give user Id"));
+		}
+		if(ObjectUtils.isEmpty(bookId)) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Please give book Id"));
+		}
+		Optional<ReaderSubscription> subscription = susbscriptionRepo.findByBookIdAndUserId(bookId, userId);
+		if(!(ObjectUtils.isEmpty(subscription)) && subscription!=null) {
+			return ResponseEntity.ok(subscription);
+		}
+		return ResponseEntity.badRequest().body(new MessageResponse("No such subscription exist for this user and book combination"));
+	}
 
 }
