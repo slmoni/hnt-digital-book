@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.book.models.Book;
@@ -26,24 +27,33 @@ public class BookService {
 		return null;
 	}
 	
-	public List<Book> getAllBooks(int authorId){
+	public List<Book> getAllBooksById(int authorId){
+		List<Book> books=bookRepo.findAllByAuthorId(authorId);
+		if(books.isEmpty()) {
+			return null;
+		}
+		return books;
+	}
+	
+	public List<Book> getAllBooks() {
 		List<Book> books=bookRepo.findAll();
 		return books;
 	}
 	
-	public Book createBook(Book book, int authorId) throws Exception{
+	public ResponseEntity<?> createBook(Book book, int authorId) throws Exception{
 		Optional<Book> createbook= bookRepo.findByTitleAndAuthorId(book.getTitle(),authorId);
 		if(createbook.isEmpty()) {
 			book.setAuthorId(authorId);
-			return bookRepo.save(book);
+			Book bokkcreated=bookRepo.save(book);
+			return ResponseEntity.ok(bokkcreated);
 		}
 		else {
-			throw new Exception("Book already exists");
+			return ResponseEntity.badRequest().body("Book already exists");
 		}
 
 	}
 	
-	public Book updateBook(Book book, int authorId, int id) throws Exception {
+	public ResponseEntity<?> updateBook(Book book, int authorId, int id) throws Exception {
 		if(bookRepo.existsById(id)) {
 			Book bookexisted= getBook(id);
 			bookexisted.setAuthorId(authorId);
@@ -53,9 +63,10 @@ public class BookService {
 			bookexisted.setPublisheddate(book.getPublisheddate());
 			bookexisted.setPublisher(book.getPublisher());
 			bookexisted.setTitle(book.getTitle());
-			return bookRepo.save(bookexisted);
+			Book booksaved=bookRepo.save(bookexisted);
+			return ResponseEntity.ok(booksaved);
 		}else{
-		throw new Exception("Cannot find the book with ID:"+id);
+			return ResponseEntity.badRequest().body("Book does not exist");
 		}
 	}
 	
@@ -122,7 +133,7 @@ public class BookService {
 	public List<Book> getAllSubscribedBooks(List<Integer> bookIds) {
 		List<Book> susbscribedBookList = new ArrayList<Book>();
 		List<Book> bookList= bookRepo.findAllById(bookIds);
-		susbscribedBookList=bookList.stream().filter(Book::isBlocked).collect(Collectors.toList());
+		susbscribedBookList=bookList.stream().filter(book-> (book.isBlocked()==false)).collect(Collectors.toList());
 		return susbscribedBookList;
 	}
 	

@@ -71,27 +71,33 @@ public class BookController {
 	}
 	
 	/* Reader get subscribed book */ //Needs to be updated
-//	@GetMapping("/{id}/getsubscribedbook")
-//	public ResponseEntity<?> getSubscribedBook(@PathVariable int id) {
-//		Book subscribed = bookService.getSubscribedBook(id);
-//		if(subscribed !=null) {
-//			return ResponseEntity.ok(subscribed);
-//		} else {
-//			return ResponseEntity.badRequest().body("Book not susbcribed");
-//		}
-//		 
-//	}
+	@GetMapping("/{id}/getsubscribedbook")
+	public ResponseEntity<?> getSubscribedBook(@PathVariable int id) {
+		Book subscribed = bookService.getBook(id);
+		if(subscribed !=null && subscribed.isBlocked()==false) {
+			Book book= new Book();
+			book.setId(subscribed.getId());
+			book.setAuthorId(subscribed.getAuthorId());
+			book.setCategory(subscribed.getCategory());
+			book.setContent(subscribed.getContent());
+			book.setPrice(subscribed.getPrice());
+			book.setPublisher(subscribed.getPublisher());
+			book.setPublisheddate(subscribed.getPublisheddate());
+			return ResponseEntity.ok(subscribed);
+		} else {
+			return ResponseEntity.badRequest().body("Book not susbcribed");
+		}
+		 
+	}
 	
 	
 	/* Reader can get book by Id */
 	@GetMapping("/getbook/{id}")
 	public ResponseEntity<?> getBook(@PathVariable int id) {
 		 Book book = bookService.getBook(id);
-		 if(!(ObjectUtils.isEmpty(book)) && book.isBlocked()==false) {
+		 // && book.isBlocked()==false
 			 return ResponseEntity.ok(book);
-		 } else {
-			 return ResponseEntity.badRequest().body("Book does not exist");
-		 }
+
 	}
 	
 	/* Reader get all subscribed books */
@@ -108,9 +114,18 @@ public class BookController {
 		} 
 	}
 	
+	@GetMapping("/getAllBooksById/{authorId}")
+	public ResponseEntity<?> getAllBooksById(@PathVariable int authorId) {
+		List<Book> allBooks= bookService.getAllBooksById(authorId);
+		return ResponseEntity.ok(allBooks);
+	}
+	
 	@GetMapping("/getAllBooks")
-	public ResponseEntity<?> getAllBooks() {
+	public ResponseEntity<?> getAllBooks( ) {
 		List<Book> allBooks= bookService.getAllBooks();
+		if(allBooks== null || allBooks.isEmpty()) {
+			return ResponseEntity.badRequest().body("No Books present");
+		}
 		return ResponseEntity.ok(allBooks);
 	}
 
